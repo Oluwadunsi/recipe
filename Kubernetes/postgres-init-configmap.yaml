@@ -1,0 +1,14 @@
+apiVersion: v1
+data:
+  table.sql: "CREATE TABLE IF NOT EXISTS favourites (\r\n    id  integer GENERATED
+    ALWAYS AS IDENTITY PRIMARY KEY,\r\n    recipe_id integer NOT NULL UNIQUE,\r\n
+    \   name VARCHAR(255) NOT NULL,\r\n    description TEXT,\r\n    cuisine VARCHAR(100),\r\n
+    \   meal_type VARCHAR(100),\r\n    difficulty VARCHAR(100),\r\n    prep_time INT,\r\n
+    \   cook_time INT,\r\n    servings INT,\r\n    calories_per_serving INT,\r\n    protein
+    INT,\r\n    dietary_tags VARCHAR(100)[],\r\n    instructions TEXT[],\r\n    ingredients
+    JSONB NOT NULL DEFAULT '[]'::jsonb,\r\n    created_at TIMESTAMPTZ NOT NULL DEFAULT
+    CURRENT_TIMESTAMP\r\n);"
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: postgres-init

@@ -1,0 +1,49 @@
+# Recipe
+#---------
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: recipe-service
+  labels:
+    app: recipe-service
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 3000
+    targetPort: 3000
+    nodePort: 30001
+    protocol: TCP
+  selector:
+    app: recipe-service
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipe-service
+  labels:
+    app: recipe-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recipe-service
+  template:
+    metadata:
+      labels:
+        app: recipe-service
+    spec:
+      containers:
+      - name: recipe-service
+        image: dunsi/recipe-service:v1
+        ports:
+        - containerPort: 3000
+        env:
+        - name: RECIPEAPI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: recipe-api-secret
+              key: RECIPEAPI_API_KEY
+---

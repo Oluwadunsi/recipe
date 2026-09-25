@@ -1,0 +1,74 @@
+# PostgreSql Database Service
+
+apiVersion: v1
+kind: Service
+metadata: 
+  name: recipe-postgres
+  labels:
+    app: recipe-postgres
+spec:
+  ports:
+  - name: recipe-postgres
+    port: 5432
+    targetPort: 5432
+  clusterIP: None
+  selector:
+    app: recipe-postgres
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: recipe-postgres
+spec:
+  serviceName: recipe-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recipe-postgres
+  template:
+    metadata:
+      labels:
+        app: recipe-postgres
+    spec:
+      containers:
+      - name: recipe-postgres
+        image: postgres:16-alpine
+        ports:
+        - containerPort: 5432
+          name: recipe-postgres
+        volumeMounts:
+        - name: recipe-postgres
+          mountPath: /var/lib/postgresql/data
+        - name: postgres-init
+          mountPath: /docker-entrypoint-initdb.d/table.sql
+          subPath: table.sql
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_DB
+      volumes:
+      - name: postgres-init
+        configMap:
+          name: postgres-init
+  volumeClaimTemplates:
+  - metadata:
+      name: recipe-postgres
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: "hostpath"
+      resources:
+        requests:
+          storage: 1Gi
+

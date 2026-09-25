@@ -1,0 +1,37 @@
+# Frontend Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: recipe-frontend
+  labels:
+    app: recipe-frontend
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    nodePort: 30080
+  selector: 
+    app: recipe-frontend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipe-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recipe-frontend
+  template:
+    metadata:
+      labels:
+        app: recipe-frontend
+    spec:
+      containers:
+      - name: recipe-frontend
+        image: dunsi/recipe-frontend:v1
+        ports:
+        - containerPort: 80

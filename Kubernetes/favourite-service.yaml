@@ -1,0 +1,64 @@
+# Fevourite Service
+
+# Recipe
+#---------
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: favourite-service
+  labels:
+    app: favourite-service
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 3001
+    targetPort: 3001
+    nodePort: 30002
+    protocol: TCP
+  selector:
+    app: favourite-service
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: favourite-service
+  labels:
+    app: favourite-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: favourite-service
+  template:
+    metadata:
+      labels:
+        app: favourite-service
+    spec:
+      containers:
+      - name: favourite-service
+        image: dunsi/favourite-service:v1
+        ports:
+        - containerPort: 3001
+        env:
+        - name: DB_HOST
+          value: "recipe-postgres"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_DB
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD

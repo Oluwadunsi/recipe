@@ -63,11 +63,14 @@ function App() {
       instructions: addedFavouriteRecipe.instructions,
       ingredients: addedFavouriteRecipe.ingredients
     }
+    
+    setFavouriteRecipe(prevFavourites => [...prevFavourites, recipeLoad]);
 
     try{
       const response = await axios.post(`http://localhost:3001/api/recipes/favourite`, recipeLoad)
       console.log(response.data);
       setSelectedRecipe(addedFavouriteRecipe);
+      getFavouriteRecipe();
 
     } catch(err) {
       console.log(err);
